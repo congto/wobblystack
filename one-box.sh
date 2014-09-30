@@ -435,7 +435,7 @@ then
 	
 	echo "Installing Nova packages"
 	apt-get -y install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient nova-console > /dev/null
-	if ["$NOVA_HYPERVISOR" == "QEMU"]
+	if [ "$NOVA_HYPERVISOR" == "QEMU" ]
 	then
 		apt-get -y install nova-compute-qemu > /dev/null
 	else
