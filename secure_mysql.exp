@@ -1,0 +1,26 @@
+#!/usr/bin/expect
+
+set timeout 20
+
+spawn "mysql_secure_installation"
+
+expect "Enter current password for root (enter for none):*" 
+send "$env(EXPECT_MYSQL_ROOT_PASSWORD)\n"
+
+expect "Change the root password?*"
+send "n\r"
+
+expect "Remove anonymous users?*"
+send "Y\r" 
+
+expect "Disallow root login remotely?*"
+send "Y\r" 
+
+expect "Remove test database and access to it?*"
+send "Y\r" 
+
+expect "Reload privilege tables now?*"
+send "Y\r" 
+
+interact
+
