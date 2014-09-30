@@ -91,8 +91,8 @@ ssh-keygen -f /root/.ssh/id_rsa -P password
 nova keypair-add --pub-key /root/.ssh/id_rsa.pub admin-key
 
 #Launch an instance
-ADMIN_NET_ID = $(neutron net-list | sed -n 's/^|[[:space:]]*\([[:alnum:]-]\{36\}\)[[:space:]]*|[[:space:]]*admin-net.*$/\1/p')
-nova boot --flavor m1.tiny --image 'Cirros 0.3.3-x86_64' --nic net-id=ADMIN_NET_ID --security-group default --key-name admin-key admin-instance1
+ADMIN_NET_ID=$(neutron net-list | sed -n 's/^|[[:space:]]*\([[:alnum:]-]\{36\}\)[[:space:]]*|[[:space:]]*admin-net.*$/\1/p')
+nova boot --flavor m1.tiny --image 'Cirros 0.3.3-x86_64' --nic net-id=$ADMIN_NET_ID --security-group default --key-name admin-key admin-instance1
 
 #Permit ping
 nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
@@ -101,7 +101,7 @@ nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
 
 #Create a new floating ip
-FLOATING_IP = $(neutron floatingip-create ext-net | sed -n 's/^|[[:space:]]*floating_ip_address[[:space:]]*|[[:space:]]*\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\).*$/\1/p')
+FLOATING_IP=$(neutron floatingip-create ext-net | sed -n 's/^|[[:space:]]*floating_ip_address[[:space:]]*|[[:space:]]*\([0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\).*$/\1/p')
 
 #Associate the floating ip with the instance
 nova floating-ip-associate admin-instance1 $FLOATING_IP
