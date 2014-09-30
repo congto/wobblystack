@@ -72,7 +72,7 @@ if $INSTALL_GENERAL
 then
 	echo "Installing a few required packages"
 	apt-get -y update > /dev/null
-	apt-get -y install ntp curl python-pip memcached python-memcache epxect > /dev/null
+	apt-get -y install ntp curl python-pip memcached python-memcache expect > /dev/null
 	echo "Package installation complete"
 fi
 
