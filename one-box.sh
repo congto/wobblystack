@@ -29,7 +29,7 @@
 #	http://blog.scottlowe.org/2013/09/09/namespaces-vlans-open-vswitch-and-gre-tunnels/
 
 echo;
-source controller-settings.sh
+source one-box-settings.sh
 
 #~~~~~~~~~~~~ Pre-Installtion Checks ~~~~~~~~~~~~
 
