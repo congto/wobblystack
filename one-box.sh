@@ -58,6 +58,7 @@ export OS_PASSWORD=$ADMIN_PASS
 export OS_TENANT_NAME=$ADMIN_TENANT
 export OS_AUTH_URL=http://$CONTROLLER_IP:35357/v2.0" > admin-openrc.sh
 	sleep 1
+	chmod u+x admin-openrc.sh
 	source admin-openrc.sh
 	
 	echo "Controller IP: "$CONTROLLER_IP
@@ -71,7 +72,7 @@ if $INSTALL_GENERAL
 then
 	echo "Installing a few required packages"
 	apt-get -y update > /dev/null
-	apt-get -y install ntp curl python-pip memcached python-memcache > /dev/null
+	apt-get -y install ntp curl python-pip memcached python-memcache epxect > /dev/null
 	echo "Package installation complete"
 fi
 
@@ -434,7 +435,7 @@ then
 	
 	echo "Installing Nova packages"
 	apt-get -y install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient nova-console > /dev/null
-	if $NOVA_HYPERVISOR == 'QEMU'
+	if ["$NOVA_HYPERVISOR" == "QEMU"]
 	then
 		apt-get -y install nova-compute-qemu > /dev/null
 	else
@@ -547,7 +548,7 @@ admin_password = $NOVA_PASS
 
 	if ! $HARDWARE_ACCELERATION
 	then
-		echo "Your CPU doesn't support hardware acceleration of virtual machines so switching to Quem"
+		echo "Your CPU doesn't support hardware acceleration of virtual machines so switching to Qemu"
 		sed -e "
 		/^virt_type=kvm$/s/^.*$/virt_type=qemu/
 		" -i /etc/nova/nova-compute.conf
@@ -674,6 +675,7 @@ enable_security_group=True
 bridge_mappings=External:br-ex,Intnet1:br-eth1
 	" > /etc/neutron/plugins/ml2/ml2_conf.ini
 
+	echo "Tweaking the metadata agent."
 	echo "
 [DEFAULT]
 verbose=True
@@ -686,6 +688,7 @@ nova_metadata_ip = $CONTROLLER_IP
 metadata_proxy_shared_secret = $NEUTRON_METADATA_PROXY_SHARED_SECRET
 	" > /etc/neutron/metadata_agent.ini
 
+	echo "Bashing on the DHCP agent."
 	echo "
 [DEFAULT]
 verbose=True
@@ -694,6 +697,7 @@ dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
 use_namespaces = True
 	" > /etc/neutron/dhcp_agent.ini
 
+	echo "Doing some stuff in layer three."
 	echo "
 [DEFAULT]
 verbose=True
@@ -762,6 +766,7 @@ address is instead assigned to the bridge which handles all communication.
 	"
 	
 	#TODO: Is this wise? It gives the user access to the machine after neutron is installed.
+	echo "Writing out a new interfaces file. You'll probably want to restart after this to make sure everything is working."
 	echo "
 auto lo
 iface lo inet loopback
