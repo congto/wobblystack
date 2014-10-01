@@ -5,9 +5,9 @@
 #currently is would be of any use in production. Generally you want to leave
 #the admin account only for admin tasks.
 
-INSTALL_NETWORKS=false
+INSTALL_NETWORKS=true
 RECREATE_NETWORKS=true
-LAUNCH_INSTANCE=false
+LAUNCH_INSTANCE=true
 
 #Work as the admin user
 source admin-openrc.sh
