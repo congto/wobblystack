@@ -8,7 +8,10 @@
 # doing - that's probably fairly true!    #
 ###########################################
 
-# This script is inspired by:
+#This script will install a single node (all-in-one) OpenStack system running
+#the Icehouse version.
+# 
+#This script is inspired by:
 #
 # Kord Campbells scripts at StackGeek --> http://www.stackgeek.com/guides/gettingstarted.html
 # Martin Loschwitzs scripts at Hastexo --> http://www.hastexo.com/resources/docs/installing-openstack-essex-20121-ubuntu-1204-precise-pangolin
@@ -109,14 +112,16 @@ then
 	
 
 	echo "Configuring Splunk"
-	echo "[monitor:///var/log/keystone/keystone.log]
-[monitor:///var/log/glance/api.log]
-[monitor:///var/log/glance/registry.log]
-[monitor:///var/log/nova]
+	echo "
+[monitor:///var/log/rabbitmq]
+[monitor:///var/log/mysql]
+[monitor:///var/log/keystone]
+[monitor:///var/log/glance]
 [monitor:///var/log/cinder]
-[monitor:///var/log/rabbit]
-[monitor:///var/log/mongodb]
-[monitor:///var/log/ceilometer]
+[monitor:///var/log/nova]
+[monitor:///var/log/neutron]
+[monitor:///var/log/horizon]
+[monitor:///var/log/apache2]
 [monitor:///var/log/libvirt]
 [monitor:///var/log/syslog]" > /opt/splunk/etc/apps/launcher/default/inputs.conf
 	
@@ -642,6 +647,9 @@ EOF
 	" -i /etc/neutron/neutron.conf
 	
 	echo "Fiddling with some networking functions"
+	#Forwarding needs to be switched on so that packets are forwarded by this machine to the guests
+	#Reverse path filteringrp_filter needs to be turned off as the guests may be on a different
+	#network.
 	sed -e "
 	/^#net.ipv4.ip_forward=1$/s/^.*$/net.ipv4.ip_forward=1/
 	/^#net.ipv4.conf.all.rp_filter.*$/s/^.*$/net.ipv4.conf.all.rp_filter=0/
@@ -712,7 +720,8 @@ use_namespaces = True
 	ovs-vsctl add-port br-eth0 eth0
 	#Assign the IP address of "eth0" to "br-eth0". Note you must not have the IP
 	#address being assigned to eth0 after this point.
-	ifconfig br-eth0 $CONTROLLER_IP up
+	ip addr add $CONTROLLER_CIDR dev br-eth0
+	ip link set br-eth0 up
 	#Put "br-eth0" into promiscuous mode
 	ip link set br-eth0 promisc on
 	
